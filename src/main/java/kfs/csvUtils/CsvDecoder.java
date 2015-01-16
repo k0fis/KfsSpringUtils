@@ -44,7 +44,7 @@ public class CsvDecoder {
         }
     }
 
-    public <T> T readEdw(String[] line, Class<T> cls, T ret) {
+    public <T> T readObject(String[] line, Class<T> cls, T ret) {
         for (int inx = 0; inx < line.length; inx++) {
             if (line[inx].isEmpty()) {
                 continue;
