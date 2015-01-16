@@ -9,8 +9,11 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class RunApp {
 
+    public static String defaultContextFile = "appContext.xml";
+    public static String defaultPidFilePropertyName = "pidfile";
+    
     public static void run(String profileName) {
-        run(profileName, "pidfile", "appContext.xml");
+        run(profileName, defaultPidFilePropertyName, defaultContextFile);
     }
     
     public static void run(String profileName, String pidPropertyFilename, String contextFile) {
