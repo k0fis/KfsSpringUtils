@@ -97,7 +97,7 @@ public class CsvDecoder {
             KfsField m = fieldMap.get(inx);
             if (m != null) {
                 sb.append(" - ").append(String.format("%30s", m.getVal(obj)))//
-                        .append(" : ").append(m.getName().substring(3));
+                        .append(" : ").append(m.getName());
             }
         }
         sb.append("\n");
