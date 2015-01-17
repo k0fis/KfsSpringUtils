@@ -11,7 +11,7 @@ import javax.persistence.PersistenceContext;
  */
 public abstract class BaseDaoJpa<T, I> implements BaseDao<T, I> {
 
-    @PersistenceContext
+    @PersistenceContext()
     protected EntityManager em;
     
     protected abstract Class<T> getDataClass();

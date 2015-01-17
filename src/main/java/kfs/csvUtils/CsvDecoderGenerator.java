@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import javax.persistence.Column;
 import kfs.utils.KfsSpringUtilsException;
 
 /**
@@ -18,11 +19,13 @@ public class CsvDecoderGenerator {
     private final Class cls;
     private final Map<Integer, Method> csvMaps;
     private final Map<Method, String> tsDecoder;
+    private final Map<Method, Integer> sizeMap;
 
     public CsvDecoderGenerator(Class cls) {
         this.cls = cls;
         tsDecoder = new HashMap<Method, String>();
         csvMaps = new HashMap<Integer, Method>();
+        sizeMap = new HashMap<Method, Integer>();
         Field fields[] = cls.getDeclaredFields();
         for (Field field : fields) {
             CsvPos pos = field.getAnnotation(CsvPos.class);
@@ -32,6 +35,12 @@ public class CsvDecoderGenerator {
                 CsvTsFormat fmt = field.getAnnotation(CsvTsFormat.class);
                 if (fmt != null) {
                     tsDecoder.put(m, fmt.value());
+                }
+                if (field.getType().equals(String.class)) {
+                    Column col = field.getAnnotation(Column.class);
+                    if (col != null) {
+                        sizeMap.put(m, col.length());
+                    }
                 }
             }
         }
@@ -66,6 +75,13 @@ public class CsvDecoderGenerator {
             Method m = csvMaps.get(inx);
             Class pcls = m.getParameterTypes()[0];
             if (String.class.equals(pcls)) {
+                Integer size = sizeMap.get(m);
+                if (size != null) {
+                sb.append("        if (line[").append(inx).append("].length() > ").append(size).append(") {\n");
+                sb.append("            throw new ").append(exception.getSimpleName()).append("(\"Cannot set ").append(m.getName().substring(3)).append(", oversized: \"+ line[").append(inx).append("].length() +\" , max: ").append(size).append(" \");\n");
+                sb.append("        }");
+                
+                }
                 sb.append("        ret.").append(csvMaps.get(inx).getName()).append("( line[").append(inx).append("]);\n");
             } else if (Double.class.equals(pcls)) {
                 sb.append("        if (line[").append(inx).append("].length() > 0) {\n");
