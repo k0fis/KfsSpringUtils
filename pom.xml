@@ -46,5 +46,17 @@
             <version>4.0.3.RELEASE</version>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>4.1.10.Final</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>kfs</groupId>
+            <artifactId>kfsVaaLib</artifactId>
+            <version>1.0</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
 </project>

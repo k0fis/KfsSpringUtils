@@ -147,6 +147,12 @@ public class CsvDecoder<T> {
             if (ret == null) {
                 ret = "";
             }
+            if (ret.getClass().isAssignableFrom(Date.class)) {
+                DateFormat tsd = tsDecoder.get(fieldMap.get(inx));
+                if (tsd != null) {
+                    ret = tsd.format((Date) ret);
+                }
+            }
             addString(sb, ret.toString(), sep, quota);
         }
         return sb;
