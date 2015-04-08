@@ -6,10 +6,12 @@ import java.lang.reflect.Field;
 import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import kfs.field.KfsField;
 
 /**
@@ -28,13 +30,14 @@ public class CsvExport implements Comparator<CsvExport.CsveItem> {
         final String sqlName;
         final CsvStrConvertor conv;
 
-        CsveItem(Class cls, Csv csvDef, Field field) {
+        CsveItem(Class cls, Field field, String csvDefInner, String sqlName, 
+                String sorintg, Class<? extends CsvStrConvertor> convClass) {
             this.field = field;
             fieldInner = new ArrayList<KfsField>();
             fieldInner.add(new KfsField(cls, field));
             Field lf = field;
-            if (csvDef.inner().length() > 0) {
-                String[] inns = csvDef.inner().split("\\.");
+            if (csvDefInner.length() > 0) {
+                String[] inns = csvDefInner.split("\\.");
                 for (String innerName : inns) {
                     if (innerName.length() > 0) {
                         Field inf;
@@ -59,8 +62,8 @@ public class CsvExport implements Comparator<CsvExport.CsveItem> {
                     }
                 }
             }
-            if (csvDef.sqlname().length() > 0) {
-                this.sqlName = csvDef.sqlname();
+            if (sqlName.length() > 0) {
+                this.sqlName = sqlName;
             } else {
                 String cn = "";
                 if (field.isAnnotationPresent(Column.class)) {
@@ -72,25 +75,25 @@ public class CsvExport implements Comparator<CsvExport.CsveItem> {
                 }
                 this.sqlName = cn;
             }
-            if (csvDef.sorting().length() > 0) {
-                this.sortName = csvDef.sorting();
+            if (sorintg.length() > 0) {
+                this.sortName = sorintg;
             } else {
                 this.sortName = field.getName();
             }
-            if (csvDef.conv().equals(CsvStrConvertor.class)) {
+            if (convClass.equals(CsvStrConvertor.class)) {
                 this.conv = null;
             } else {
-                if (convs.containsKey(csvDef.conv())) {
-                    this.conv = convs.get(csvDef.conv());
+                if (convs.containsKey(convClass)) {
+                    this.conv = convs.get(convClass);
                 } else {
                     try {
-                        this.conv = csvDef.conv().newInstance();
+                        this.conv = convClass.newInstance();
                     } catch (InstantiationException ex) {
-                        throw new CsvException("Cannot init " + csvDef.conv().getSimpleName(), ex);
+                        throw new CsvException("Cannot init " + convClass.getSimpleName(), ex);
                     } catch (IllegalAccessException ex) {
-                        throw new CsvException("Cannot init " + csvDef.conv().getSimpleName(), ex);
+                        throw new CsvException("Cannot init " + convClass.getSimpleName(), ex);
                     }
-                    convs.put(csvDef.conv(), conv);
+                    convs.put(convClass, conv);
                 }
             }
         }
@@ -144,9 +147,26 @@ public class CsvExport implements Comparator<CsvExport.CsveItem> {
                 }
             }
             if (csvDef != null) {
-                items.add(new CsveItem(cls, csvDef, df));
+                items.add(new CsveItem(cls, df, csvDef.inner(), csvDef.sqlname(),
+                csvDef.sorting(), csvDef.conv()));
             }
         }
+        if (items.size() <= 0) {
+            // use persistence api for definition
+            Class<? extends CsvStrConvertor> convClass;
+            for (Field df : cls.getDeclaredFields()) {
+                if (df.isAnnotationPresent(Transient.class)) {
+                    continue;
+                }
+                if (df.getType().isAssignableFrom(Date.class)) {
+                    convClass = TimestampConvertor.class;
+                } else {
+                    convClass = CsvStrConvertor.class;
+                }
+                items.add(new CsveItem(cls, df, "", "", "", convClass));
+            }
+        }
+        
         if (items.size() > 0) {
             Collections.sort(items, this);
         } else {
