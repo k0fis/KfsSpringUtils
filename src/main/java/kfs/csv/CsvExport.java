@@ -163,7 +163,15 @@ public class CsvExport implements Comparator<CsvExport.CsveItem> {
                 } else {
                     convClass = CsvStrConvertor.class;
                 }
-                items.add(new CsveItem(cls, df, "", "", "", convClass));
+                String csvDefInner = "";
+                if (df.isAnnotationPresent(CsvDbInner.class)) {
+                    csvDefInner = df.getAnnotation(CsvDbInner.class).value();
+                }
+                String sqlName = "";
+                if (df.isAnnotationPresent(CsvDbName.class)) {
+                    sqlName = df.getAnnotation(CsvDbName.class).value();
+                }
+                items.add(new CsveItem(cls, df, csvDefInner, sqlName, "", convClass));
             }
         }
         
