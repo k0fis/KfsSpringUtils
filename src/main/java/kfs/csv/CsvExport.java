@@ -42,7 +42,7 @@ public class CsvExport implements Comparator<CsvExport.CsveItem> {
                     if (innerName.length() > 0) {
                         Field inf;
                         try {
-                            inf = lf.getType().getField(innerName);
+                            inf = lf.getType().getDeclaredField(innerName);
                         } catch (NoSuchFieldException ex) {
                             throw new CsvException("Cannot find inner field "
                                     + lf.getType().getSimpleName() + "." + innerName + " defined in "
