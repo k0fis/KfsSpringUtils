@@ -152,10 +152,7 @@ public class CsvExport implements Comparator<CsvExport.CsveItem> {
             }
             if (items.size() > 0) {
                 Collections.sort(items, this);
-            } else {
-                throw new CsvException("Cannot find CSV definition in class: " + cls.getSimpleName());
             }
-
         }
         if (items.size() <= 0) {
             // use persistence api for definition
