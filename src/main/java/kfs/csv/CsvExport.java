@@ -30,7 +30,7 @@ public class CsvExport implements Comparator<CsvExport.CsveItem> {
         final String sqlName;
         final CsvStrConvertor conv;
 
-        CsveItem(Class cls, Field field, String csvDefInner, String sqlName, 
+        CsveItem(Class cls, Field field, String csvDefInner, String sqlName,
                 String sorintg, Class<? extends CsvStrConvertor> convClass) {
             this.field = field;
             fieldInner = new ArrayList<KfsField>();
@@ -148,8 +148,14 @@ public class CsvExport implements Comparator<CsvExport.CsveItem> {
             }
             if (csvDef != null) {
                 items.add(new CsveItem(cls, df, csvDef.inner(), csvDef.sqlname(),
-                csvDef.sorting(), csvDef.conv()));
+                        csvDef.sorting(), csvDef.conv()));
             }
+            if (items.size() > 0) {
+                Collections.sort(items, this);
+            } else {
+                throw new CsvException("Cannot find CSV definition in class: " + cls.getSimpleName());
+            }
+
         }
         if (items.size() <= 0) {
             // use persistence api for definition
@@ -174,12 +180,7 @@ public class CsvExport implements Comparator<CsvExport.CsveItem> {
                 items.add(new CsveItem(cls, df, csvDefInner, sqlName, "", convClass));
             }
         }
-        
-        if (items.size() > 0) {
-            Collections.sort(items, this);
-        } else {
-            throw new CsvException("Cannot find CSV definition in class: " + cls.getSimpleName());
-        }
+
     }
 
     @Override
