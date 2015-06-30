@@ -11,6 +11,8 @@ public interface BaseDao<T, I> {
     public void insert(T date);
 
     public void update(T data);
+    
+    public void save(T data);
 
     public void delete(T data);
 

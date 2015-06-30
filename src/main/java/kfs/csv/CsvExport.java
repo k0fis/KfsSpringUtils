@@ -210,7 +210,7 @@ public class CsvExport implements Comparator<CsvExport.CsveItem> {
         return sb;
     }
 
-    public CharSequence getOracleSqlLdrControlFile() {
+    public CharSequence getOracleSqlLdrControlFile(String tposfix) {
         String schema = "";
         String tableName = cls.getSimpleName();
         if (cls.isAnnotationPresent(Table.class)) {
@@ -222,7 +222,7 @@ public class CsvExport implements Comparator<CsvExport.CsveItem> {
                 tableName = t.name();
             }
         }
-        return getOracleSqlLdrControlFile(tableName, schema);
+        return getOracleSqlLdrControlFile(tableName+tposfix, schema);
     }
 
     private String getColumnName(Field field, Column col) {

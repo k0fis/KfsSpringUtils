@@ -1,6 +1,7 @@
 package kfs.springutils;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 
 /**
@@ -13,11 +14,11 @@ public abstract class BaseDaoJpa<T, I> implements BaseDao<T, I> {
 
     @PersistenceContext()
     protected EntityManager em;
-    
+
     protected abstract Class<T> getDataClass();
-    
+
     protected abstract I getId(T data);
-    
+
     @Override
     public void insert(T date) {
         em.persist(date);
@@ -26,6 +27,15 @@ public abstract class BaseDaoJpa<T, I> implements BaseDao<T, I> {
     @Override
     public void update(T data) {
         em.merge(data);
+    }
+
+    @Override
+    public void save(T data) {
+        if (getId(data) == null) {
+            insert(data);
+        } else {
+            update(data);
+        }
     }
 
     @Override
