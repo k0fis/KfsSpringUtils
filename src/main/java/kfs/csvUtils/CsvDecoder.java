@@ -162,7 +162,12 @@ public class CsvDecoder<T> {
         StringBuilder sb = new StringBuilder();
         int ynx = 0;
         for (Integer inx : getSortedInxList()) {
-            sb.append(String.format("\n%30s", line[ynx++]));
+            if (line.length > inx) {
+                sb.append(String.format("\n%30s", line[ynx]));
+                ynx++;
+            } else {
+                sb.append(String.format("\n%30s", "-- out of index --"));
+            }
             KfsField m = fieldMap.get(inx);
             if (m != null) {
                 sb.append(" - ").append(String.format("%30s", m.getVal(obj)))//
