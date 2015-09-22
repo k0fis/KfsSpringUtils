@@ -11,6 +11,7 @@ import kfs.utils.KfsSpringUtilsException;
  */
 public class KfsField {
 
+    private Object data;
     private final Class cls;
     private final Field field;
     private Method setFieldMethod;
@@ -85,5 +86,13 @@ public class KfsField {
         } catch (InvocationTargetException ex) {
             throw new KfsSpringUtilsException("Cannot get " + field.getName(), ex);
         }
+    }
+
+    public Object getData() {
+        return data;
+    }
+
+    public void setData(Object data) {
+        this.data = data;
     }
 }
